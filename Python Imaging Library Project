@@ -1,0 +1,60 @@
+import PIL
+from PIL import Image, ImageEnhance, ImageDraw, ImageFont
+results = []
+channel_mult = [0.1,0.5,0.9]
+# Create channel 0
+for intensity in (channel_mult):
+    um_pic=Image.open("readonly/msi_recruitment.gif")
+    um_pic=um_pic.convert('RGB')
+    font_size = 50
+    font_name = ImageFont.truetype('readonly/fanwood-webfont.ttf', font_size)
+    draw = ImageDraw.Draw(um_pic)
+    draw.rectangle([0, um_pic.height-font_size,um_pic.width,um_pic.height], fill="black")
+    draw.text((0, um_pic.height - font_size), 'channel 0 intensity {}'.format(intensity), font = font_name)
+    r, g, b = um_pic.split()
+    r = r.point(lambda x: x * intensity)
+    result = Image.merge('RGB', (r, g, b))
+    result = result.resize((int(result.width / 2), (int(result.height / 2))))
+    results.append(result)
+# Create Channel 1
+for intensity in (channel_mult):
+
+    um_pic=Image.open("readonly/msi_recruitment.gif")
+    um_pic=um_pic.convert('RGB')
+    font_size = 50
+    font_name = ImageFont.truetype('readonly/fanwood-webfont.ttf', font_size)
+    draw = ImageDraw.Draw(um_pic)
+    draw.rectangle([0, um_pic.height-font_size,um_pic.width,um_pic.height], fill="black")
+    draw.text((0, um_pic.height - font_size), 'channel 1 intensity {}'.format(intensity), font = font_name)
+    r, g, b = um_pic.split()
+    g = g.point(lambda x: x * intensity)
+    result = Image.merge('RGB', (r, g, b))
+    result = result.resize((int(result.width / 2), (int(result.height / 2))))
+    results.append(result)
+# Create channel 2
+for intensity in (channel_mult):
+    um_pic=Image.open("readonly/msi_recruitment.gif")
+    um_pic=um_pic.convert('RGB')
+    font_size = 50
+    font_name = ImageFont.truetype('readonly/fanwood-webfont.ttf', font_size)
+    draw = ImageDraw.Draw(um_pic)
+    draw.rectangle([0, um_pic.height-font_size,um_pic.width,um_pic.height], fill="black")
+    draw.text((0, um_pic.height - font_size), 'channel 2 intensity {}'.format(intensity), font = font_name)
+    r, g, b = um_pic.split()
+    b = b.point(lambda x: x * intensity)
+    result = Image.merge('RGB', (r, g, b))
+    result = result.resize((int(result.width / 2), (int(result.height / 2))))
+    results.append(result)
+first_image = results[0]
+contact_sheet = PIL.Image.new(first_image.mode, (first_image.width * 3, first_image.height * 3))
+x = 0
+y = 0
+for image in results:
+    contact_sheet.paste(image, (x, y))
+    if x + first_image.width == contact_sheet.width:
+        x = 0
+        y = y + first_image.height
+    else:
+        x = x + first_image.width
+contact_sheet = contact_sheet.resize((int(contact_sheet.width),int(contact_sheet.height) ))
+display(contact_sheet)
