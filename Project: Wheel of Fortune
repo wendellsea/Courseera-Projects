@@ -1,0 +1,91 @@
+VOWEL_COST = 250
+LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+VOWELS = 'AEIOU'
+
+# Part A: WOFPlayer
+class WOFPlayer():
+
+    def __init__(self, player_name):
+        self.name = player_name
+        self.prizeMoney = 0
+        self.prizes = []
+
+    def addMoney(self, amt):
+        self.prizeMoney += amt
+
+    def goBankrupt(self):
+        self.prizeMoney = 0
+
+    def addPrize(self, prize):
+        self.prizes.append(prize)
+
+    def __str__(self):
+        current = "{} (${})".format(self.name, str(self.prizeMoney))
+        return current
+
+# Part B: WOFHumanPlayer
+class WOFHumanPlayer(WOFPlayer):
+
+    def getMove(self, category, obscuredPhrase, guessed):
+        summary = input(self.name + " has $" + str(self.prizeMoney) + '\n'
+                        + "Category: " + category + '\n'
+                        + "Phrase: " + obscuredPhrase + '\n'
+                        + "Guessed: " + guessed + '\n'
+                        + "Guess a letter, phrase, or type 'exit', or 'pass':")
+        return summary
+
+# Part C: WOFComputerPlayer
+class WOFComputerPlayer(WOFPlayer):
+
+    SORTED_FREQUENCIES = 'ZQXJKVBPYGFWMUCLDRHSNIOATE'
+
+    def __init__(self,player_name,difficulty):
+        super().__init__(player_name)
+        self.name = player_name
+        self.difficulty = difficulty
+        self.prizeMoney = 0
+        self.prizes = []
+
+    def smartCointFlip(self):
+        rand = random.randint(1, 10)
+        if rand > self.difficulty:
+            return True
+        elif rand <= self.difficulty:
+            return False
+
+    def getPossibleLetters(self, guessed):
+            possible_letters = []
+
+            if self.prizeMoney >= VOWEL_COST:
+                for letter in LETTERS:
+                    if letter not in guessed:
+                        possible_letters.append(letter)
+            else:
+                for letter in LETTERS:
+                    if (letter not in guessed) and (letter not in VOWELS):
+                        possible_letters.append(letter)
+
+            return possible_letters
+
+    def getMove(self, category, obscuredPhrase, guessed):
+
+        letters_result = self.getPossibleLetters(guessed)
+        flip_result = self.smartCointFlip()
+
+        if len(letters_result) == 0:
+            return 'pass'
+        elif (self.prizeMoney < VOWEL_COST) and (all(True for x in letters_result if x not in LETTERS) == True):
+            return 'pass'
+        else:
+            if flip_result is True:
+                for letter in letters_result:
+                    max_letter = 0
+                    if letter in self.SORTED_FREQUENCIES:
+                        letter_index = self.SORTED_FREQUENCIES.index(letter)
+                        if letter_index >= max_letter:
+                            max_letter = letter
+                    return max_letter
+            else:
+                rand_letter = random.choice(letters_result)
+                return rand_letter
+
